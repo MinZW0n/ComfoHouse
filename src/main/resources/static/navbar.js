@@ -2,25 +2,25 @@ export const createNavbar = () => {
   const pathname = window.location.pathname;
 
   switch (pathname) {
-    case "/":
+    case "/home":
       addNavElements("admin register login account logout");
       break;
-    case "/account/orders/":
+    case "/account-orders/":
       addNavElements("admin account logout");
       break;
-    case "/account/security/":
+    case "/account-security/":
       addNavElements("admin account logout");
       break;
-    case "/account/signout/":
+    case "/account-signout/":
       addNavElements("admin account logout");
       break;
     case "/account/":
       addNavElements("admin logout");
       break;
-    case "/admin/orders/":
+    case "/admin-orders/":
       addNavElements("admin account logout");
       break;
-    case "/admin/users/":
+    case "/admin-users/":
       addNavElements("admin account logout");
       break;
     case "/admin/":
@@ -29,25 +29,25 @@ export const createNavbar = () => {
     case "/cart/":
       addNavElements("admin register login account logout");
       break;
-    case "/category/add/":
+    case "/category-add/":
       addNavElements("admin account productAdd logout");
       break;
     case "/login/":
       addNavElements("register");
       break;
-    case "/order/complete/":
+    case "/order-complete/":
       addNavElements("admin account logout");
       break;
     case "/order/":
       addNavElements("admin account logout");
       break;
-    case "/product/add/":
+    case "/product-add/":
       addNavElements("admin account logout");
       break;
-    case "/product/detail/":
+    case "/product-detail/":
       addNavElements("admin register login account logout");
       break;
-    case "/product/list/":
+    case "/product-list/":
       addNavElements("admin register login account logout");
       break;
     case "/register/":
@@ -75,7 +75,7 @@ const addNavElements = (keyString) => {
   // 로그인 완료된 상태에서만 보이게 될 navbar 요소들
   const itemsAfterLogin = {
     account: '<li><a href="/account">계정관리</a></li>',
-    logout: '<li><a href="#" id="logout">로그아웃</a></li>',
+    logout: '<li><a href="/home" id="logout">로그아웃</a></li>',
     productAdd: '<li><a href="/product/add">제품 추가</a></li>',
     categoryAdd: '<li><a href="/category/add">카테고리 추가</a></li>',
   };
@@ -95,7 +95,7 @@ const addNavElements = (keyString) => {
           sessionStorage.removeItem('id');
           sessionStorage.removeItem('isAdmin');
 
-          window.location.href = '/';
+          window.location.href = '/home';
         });
       }
   `;

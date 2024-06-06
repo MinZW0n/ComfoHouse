@@ -46,7 +46,7 @@ async function handleSubmit(e) {
   try {
     const data = { email, password };
 
-    const result = await Api.post("http://localhost:8080/users/sign-in", data);
+    const result = await Api.post("http://34.64.249.228:8080/users/sign-in", data);
     const { token, isAdmin, id } = result;
 
     // 로그인 성공, 토큰을 세션 스토리지에 저장
@@ -60,16 +60,16 @@ async function handleSubmit(e) {
 
 
     // 기존 다른 페이지에서 이 로그인 페이지로 온 경우, 다시 돌아가도록 해 줌.
-    const { previouspage } = getUrlParams();
+/*    const { previouspage } = getUrlParams();
 
     if (previouspage) {
       window.location.href = previouspage;
 
       return;
-    }
+    }*/
 
     // 기존 다른 페이지가 없었던 경우, 그냥 기본 페이지로 이동
-    window.location.href = "/";
+    window.location.href = "/home";
   } catch (err) {
     console.error(err.stack);
     alert(`문제가 발생하였습니다. 확인 후 다시 시도해 주세요: ${err.message}`);

@@ -48,6 +48,9 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderProcess orderProcess;
 
+    @Column(name = "postal_code")
+    private int postalCode;
+
     public enum OrderProcess {
         received, confirmed, canceled
     }
@@ -69,6 +72,9 @@ public class Orders {
 
     private String request = "안전하게 배송해주세요";
 
+    @Column(name = "order_by")
+    private String orderBy;
+
     @NotNull
     @Min(100)
     private Long totalCost;
@@ -85,10 +91,11 @@ public class Orders {
     private User user;
 
     @Builder
-    public Orders(User user, Date orderDate,
+    public Orders(User user, Date orderDate, String orderBy,
                  String address, String receiver,
-                 String request, Long totalCost) {
+                 String request, Long totalCost, int postalCode) {
         this.user = user;
+        this.orderBy = orderBy;
         this.orderDate = orderDate;
         this.orderProcess = OrderProcess.received;
         this.deliveryProcess = DeliveryProcess.preparing;
@@ -96,6 +103,7 @@ public class Orders {
         this.address = address;
         this.request = request;
         this.totalCost = totalCost;
+        this.postalCode = postalCode;
     }
 
     public void updateOrder(OrderUpdateDto orderUpdateDto) {

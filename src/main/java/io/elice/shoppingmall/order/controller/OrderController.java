@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,7 @@ public class OrderController {
     @GetMapping
     public Page<Orders> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page,
                                      @RequestParam(name = "size", defaultValue = "10") int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("orderDate").descending());
 
         return orderService.getAllOrders(pageRequest);
     }
@@ -56,13 +56,13 @@ public class OrderController {
     }
 
     // 사용자 별로 주문 조회
-    @GetMapping("/user/{id}")
-    public Page<Orders> getOrderByUser(@PathVariable("id") Long id,
+    @GetMapping("/user/{userId}")
+    public Page<Orders> getOrderByUser(@PathVariable("userId") Long userId,
                                        @RequestParam(name = "page", defaultValue = "0") int page,
                                        @RequestParam(name = "size", defaultValue = "5") int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("orderDate").descending());
 
-        return orderService.getOrdersByUserId(id, pageRequest);
+        return orderService.getOrdersByUserId(userId, pageRequest);
     }
 
     // 주문 수정
@@ -107,12 +107,10 @@ public class OrderController {
 
     // 주문 삭제 - 관리자권한
     @DeleteMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteOrder(@PathVariable("id") Long id) {
 
         String userName = orderService.deleteOrder(id);
-        return ResponseEntity.ok(OrderResponseDto.builder()
-                .message(userName + "님에게 배송할 주문이 정상적으로 취소되었습니다!")
-                .build());
+        return ResponseEntity.ok(userName + "님에게 배송할 주문이 정상적으로 취소되었습니다!");
 
     }
 }

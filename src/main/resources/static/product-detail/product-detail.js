@@ -19,6 +19,9 @@ checkUrlParams("productId");
 addAllElements();
 addAllEvents();
 
+// 고상현 추가: 현재 로그인한 유저의 아이디를 가져옵니다.
+const sessionUser = sessionStorage.getItem("id");
+
 // html에 요소를 추가하는 함수들을 묶어주어서 코드를 깔끔하게 하는 역할임.
 async function addAllElements() {
   createNavbar();
@@ -34,11 +37,11 @@ async function addAllElements() {
 }
 
 // addEventListener들을 묶어주어서 코드를 깔끔하게 하는 역할임.
-function addAllEvents() {}
+function addAllEvents() { }
 
 async function insertProductData(productId) {
   try {
-    const response = await fetch(`http://localhost:8080/products/${productId}`);
+    const response = await fetch(`http://34.64.249.228:8080/products/${productId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch product details");
     }
@@ -47,40 +50,45 @@ async function insertProductData(productId) {
 
     // 객체 destructuring
     const {
-      title,
-      detailDescription,
-      menufacturer,
-      imageKey,
+      productName,
+      content,
+      brandName,
       isRecommended,
       price,
+      category: { imageUrl }
     } = product;
-    const imageUrl = `http://localhost:8080/attach/images/${product.productImageUrl}`;
 
-    productImageTag.src = imageUrl;
-    titleTag.innerText = title;
-    detailDescriptionTag.innerText = detailDescription;
-    manufacturerTag.innerText = menufacturer;
+    // 이미지 파일 이름 추출
+    const filename = imageUrl.substring(imageUrl.lastIndexOf('\\') + 1);
+
+    // 이미지 URL 생성
+    const imageURL = `http://34.64.249.228:8080/${filename}`;
+
+    productImageTag.src = imageURL;
+    titleTag.innerText = productName;
+    detailDescriptionTag.innerText = content;
+    manufacturerTag.innerText = brandName;
     priceTag.innerText = `${addCommas(price)}원`;
 
     if (isRecommended) {
       titleTag.insertAdjacentHTML(
-          "beforeend",
-          '<span class="tag is-success is-rounded">추천</span>'
+        "beforeend",
+        '<span class="tag is-success is-rounded">추천</span>'
       );
     }
 
     addToCartButton.addEventListener("click", async () => {
-      try {
-        await insertDb(product);
 
+      const result = await fetch(`http://34.64.249.228:8080/carts/user/${sessionUser}/items?product=${productId}`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      // Key already exists 에러면 아래와 같이 alert함
+      if (result.status === 400) {
+        alert("이미 장바구니에 추가되어 있습니다.");
+      } else {
         alert("장바구니에 추가되었습니다.");
-      } catch (err) {
-        // Key already exists 에러면 아래와 같이 alert함
-        if (err.message.includes("Key")) {
-          alert("이미 장바구니에 추가되어 있습니다.");
-        }
-
-        console.log(err);
       }
     });
 
@@ -130,4 +138,19 @@ async function insertDb(product) {
     // 위와 마찬가지 방식
     data.selectedIds = selectedIds ? [...selectedIds, id] : [id];
   });
+}
+
+//리뷰 데이터 가져오는 api 호출
+async function fetchReviews(productId) {
+  try {
+    const response = await fetch(`http://34.64.249.228:8080/reviews/product/${productId}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch reviews");
+    }
+    const reviews = await response.json();
+    return reviews.content;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
+  }
 }

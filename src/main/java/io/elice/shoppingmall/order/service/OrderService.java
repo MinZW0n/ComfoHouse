@@ -35,11 +35,13 @@ public class OrderService {
 
         Orders order = Orders.builder()
                 .user(foundUser.get())
+                .orderBy(foundUser.get().getNickname())
                 .orderDate(orderRequestDto.getOrderDate())
                 .receiver(orderRequestDto.getReceiver())
                 .address(orderRequestDto.getAddress())
                 .request(orderRequestDto.getRequest())
                 .totalCost(orderRequestDto.getTotalCost())
+                .postalCode(orderRequestDto.getPostalCode())
                 .build();
 
         return orderRepository.save(order);
@@ -65,6 +67,7 @@ public class OrderService {
         if(foundOrder.getTotalElements() == 0) {
             throw new IllegalArgumentException("주문이 존재하지 않습니다.");
         }
+
         return foundOrder;
     }
 
@@ -133,6 +136,11 @@ public class OrderService {
     public String deleteOrder(Long id) {
 
         Orders toDeleteOrder = checkOrder(id);
+        Orders.DeliveryProcess status = toDeleteOrder.getDeliveryProcess();
+        if(status.equals(Orders.DeliveryProcess.complete) ||
+                status.equals(Orders.DeliveryProcess.shipping)) {
+            throw new IllegalArgumentException("배달 중이거나 배달이 완료된 주문은 취소할 수 없습니다!");
+        }
 
         orderRepository.deleteById(id);
 
