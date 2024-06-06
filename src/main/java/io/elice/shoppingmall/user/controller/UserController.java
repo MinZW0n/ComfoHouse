@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/checkEmail")
-    public Boolean checkEmail(@RequestParam(value = "email") String email) {
+    public Boolean checkEmail(@RequestParam String email) {
 
         return userService.checkEmail(email);
     }

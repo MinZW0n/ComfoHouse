@@ -200,14 +200,15 @@ async function insertUsers(page = 0, size = 10) {
   const usersResponse = await Api.get(`http://34.64.249.228:8080/users?page=${page}&size=${size}`);
   const users = usersResponse.content;
 
-
-    const usersCount = await Api.get(`http://34.64.249.228:8080/users/count-user`);
-    const adminCount = await Api.get(`http://34.64.249.228:8080/users/count-admin`);
+  // 총 사용자 수와 관리자 수는 한 번만 불러오면 되므로, 첫 페이지 로드 시에만 호출
+  if (page === 0) {
+    const usersCount = await Api.get(`http://localhost:8080/users/count-user`);
+    const adminCount = await Api.get(`http://localhost:8080/users/count-admin`);
 
     // 총 요약에 값 삽입
     document.getElementById('usersCount').innerText = addCommas(usersCount);
     document.getElementById('adminCount').innerText = addCommas(adminCount);
-
+  }
 
   // 사용자 목록 초기화 (새 페이지 로드 시 이전 목록 삭제)
   usersContainer.innerHTML = '';
@@ -262,20 +263,17 @@ async function insertUsers(page = 0, size = 10) {
       const isAdmin = true;
 
       // api 요청
+
       await Api.patch(`http://34.64.249.228:8080/users/${id}/role`,"", isAdmin);
       const usersCount = await Api.get(`http://34.64.249.228:8080/users/count-user`);
       const adminCount = await Api.get(`http://34.64.249.228:8080/users/count-admin`);
 
       document.getElementById('usersCount').innerText = addCommas(usersCount);
       document.getElementById('adminCount').innerText = addCommas(adminCount);
+
     });
 
     deleteButton.addEventListener("click", () => {
-      if(roleSelectBox.value === "ADMIN"){
-        alert("관리자 계정은 삭제할 수 없습니다.");
-
-        return;
-      }
       userIdToDelete = id;
       openModal();
     });
@@ -319,9 +317,6 @@ async function deleteUserData(e) {
 
     // 전역변수 초기화
     userIdToDelete = "";
-
-    changePage(currentPage);
-
 
     closeModal();
   } catch (err) {
